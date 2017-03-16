@@ -1,4 +1,11 @@
 <resources>
-    <string name="app_name">MeterialDesign</string>
+    <string name="app_name">MaterialDesign</string>
     <string name="action_settings">Settings</string>
+    <string name="profile">个人</string>
+    <string name="people">人群</string>
+    <string name="place">定位</string>
+    <string name="events">事件</string>
+    <string name="settings">设置</string>
+    <string name="email">yuanxiongx.li@Gmail.com</string>
+    <string name="userName">YuanXiong Li</string>
 </resources>
