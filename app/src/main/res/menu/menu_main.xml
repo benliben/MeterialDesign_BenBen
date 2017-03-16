@@ -1,10 +1,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.android.benben.meterialdesign.MainActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:id="@+id/pen"
+        android:icon="@mipmap/ic_pen"
+        android:title="Pen"
+        app:showAsAction="always" />//永远显示在屏幕上
+    <item
+        android:id="@+id/book"
+        android:icon="@mipmap/ic_book"
+        android:title="book"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/ink"
+        android:icon="@mipmap/ic_ink"
+        android:title="Ink"
+        app:showAsAction="ifRoom" />//空间足够显示在屏幕上，空间不够就显示在菜单中
+    <item
+        android:id="@+id/ink_slab"
+        android:icon="@mipmap/ic_ink_slab"
+        android:title="InkSlab"
+        app:showAsAction="never" />//永远显示在菜单中
+
 </menu>
