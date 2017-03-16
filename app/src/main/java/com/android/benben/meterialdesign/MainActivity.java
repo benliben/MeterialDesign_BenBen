@@ -22,11 +22,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+
 public class MainActivity extends AppCompatActivity {
 
-    private DrawerLayout mDrawerLayout;
-    private SwipeRefreshLayout swipeRefresh;
-
+    @InjectView(R.id.toolbar)
+    Toolbar mToolbar;
+    @InjectView(R.id.main_recycler)
+    RecyclerView mRecycler;
+    @InjectView(R.id.main_swipe_refresh)
+    SwipeRefreshLayout mSwipeRefresh;
+    @InjectView(R.id.main_fab)
+    FloatingActionButton mFab;
+    @InjectView(R.id.main_vav_view)
+    NavigationView mVavView;
+    @InjectView(R.id.activity_main)
+    DrawerLayout mMain;
+    private List<Picture> pictureList = new ArrayList<>();
+    private PictureAdapter mAdapter;
     private Picture[] pictures = {
             new Picture(R.drawable.ic_1, "1"), new Picture(R.drawable.ic_2, "2"),
             new Picture(R.drawable.ic_3, "3"), new Picture(R.drawable.ic_4, "4"),
@@ -48,43 +62,41 @@ public class MainActivity extends AppCompatActivity {
             new Picture(R.drawable.ic_35, "35"), new Picture(R.drawable.ic_36, "36"),
             new Picture(R.drawable.ic_37, "37"), new Picture(R.drawable.ic_38, "38"),
             new Picture(R.drawable.ic_39, "39"), new Picture(R.drawable.ic_40, "40"),
-            new Picture(R.drawable.ic_41, "41")
-
-    };
-
-    private List<Picture> pictureList = new ArrayList<>();
-    private PictureAdapter adapter;
+            new Picture(R.drawable.ic_41, "41")};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeAsUpIndicator(R.mipmap.ic_menu);
-        }
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.activity_main);
+        ButterKnife.inject(this);
+        initToolBar();
+        initNav();
+        initFAB();
+        setData();
+        initView();
+        initSwipe();
+    }
 
-        /*找到左抽屉控件*/
-        NavigationView navView = (NavigationView) findViewById(R.id.main_vav_view);
-        /*默认选中一个item*/
-        navView.setCheckedItem(R.id.nav_events);
-        /*设置点击事件*/
-        navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+    private void initSwipe() {
+        mSwipeRefresh.setColorSchemeResources(R.color.colorGreen, R.color.colorAccent, R.color.colorPrimaryDark);
+        mSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                /*没有做筛选，点击任何一个item都可以使左抽屉关闭吊*/
-                mDrawerLayout.closeDrawers();
-                return true;
+            public void onRefresh() {
+                refreshFruits();//刷新操作
             }
         });
+    }
 
-        /*FloatingActionButton和SnackBar*/
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.main_fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+    private void initView() {
+        mRecycler.setLayoutManager(new GridLayoutManager(this, 3));
+        mAdapter = new PictureAdapter(this, pictureList);
+        mRecycler.setAdapter(mAdapter);
+
+    }
+
+    private void initFAB() {
+               /*FloatingActionButton和SnackBar*/
+        mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 /*SnackBar*/
@@ -92,28 +104,35 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         Toast.makeText(MainActivity.this, "内部点击", Toast.LENGTH_SHORT).show();
-                        return;
                     }
                 }).show();
                 Toast.makeText(MainActivity.this, "外层点击", Toast.LENGTH_SHORT).show();
             }
         });
 
-        setData();
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.main_recycler);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
-        adapter = new PictureAdapter(this, pictureList);
-        recyclerView.setAdapter(adapter);
+    }
 
-
-        swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.main_swipe_refresh);
-        swipeRefresh.setColorSchemeResources(R.color.colorGreen, R.color.colorAccent, R.color.colorPrimaryDark);
-        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+    private void initNav() {
+               /*默认选中一个item*/
+        mVavView.setCheckedItem(R.id.nav_events);
+        /*设置点击事件*/
+        mVavView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public void onRefresh() {
-                refreshFruits();//刷新操作
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                /*没有做筛选，点击任何一个item都可以使左抽屉关闭吊*/
+                mMain.closeDrawers();
+                return true;
             }
         });
+    }
+
+    private void initToolBar() {
+        setSupportActionBar(mToolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.mipmap.ic_menu);
+        }
     }
 
     private void refreshFruits() {
@@ -130,8 +149,8 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         setData();
-                        adapter.notifyDataSetChanged();
-                        swipeRefresh.setRefreshing(false);
+                        mAdapter.notifyDataSetChanged();
+                        mSwipeRefresh.setRefreshing(false);
                     }
                 });
             }
@@ -170,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "你点击了砚", Toast.LENGTH_SHORT).show();
                 break;
             case android.R.id.home:
-                mDrawerLayout.openDrawer(GravityCompat.START);
+                mMain.openDrawer(GravityCompat.START);
                 break;
         }
         return true;

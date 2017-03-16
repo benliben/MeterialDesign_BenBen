@@ -1,6 +1,7 @@
 package com.android.benben.meterialdesign;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,12 +36,23 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.MyViewHo
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
+    public void onBindViewHolder(final MyViewHolder holder, int position) {
         if (mData != null) {
-            holder.mName.setText(mData.get(position).getPictureNmae());
+            final Picture item = mData.get(position);
+            holder.mName.setText(item.getPictureNmae());
             /*由于图片可能导致报oom所以通过Glide进行处理*/
 //            holder.mPicture.setImageResource(mData.get(position).getPictureId());
-            Glide.with(mContext).load(mData.get(position).getPictureId()).into(holder.mPicture);
+            Glide.with(mContext).load(item.getPictureId()).into(holder.mPicture);
+
+            holder.mPicture.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(mContext, HomeActivity.class);
+                    intent.putExtra(HomeActivity.PICTURE_NAME, item.getPictureNmae());
+                    intent.putExtra(HomeActivity.PICTURE_ID, item.getPictureId());
+                    mContext.startActivity(intent);
+                }
+            });
         }
 
     }
